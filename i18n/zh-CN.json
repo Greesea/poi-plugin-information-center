@@ -1,0 +1,134 @@
+{
+    "meta": {
+        "name": "信息中心",
+        "description": "desc-chn"
+    },
+    "root": {
+        "tabs": {
+            "common": "常用",
+            "ships": "舰队",
+            "equipments": "装备",
+            "quests": "任务",
+            "settings": "设置"
+        }
+    },
+    "translate": {
+        "useItems": {},
+        "ships": {},
+        "equipments": {},
+        "quests": {}
+    },
+    "components": {
+        "shipItem": {
+            "hp": "HP：\n当前：{{value}}，最大：{{max}}",
+            "luck": "运：\n初始：{{default}}，当前：{{value}}，最大：{{max}}",
+            "fire": "火力：\n初始：{{default}}，当前：{{value}}，最大：{{max}}",
+            "torpedo": "雷装：\n初始：{{default}}，当前：{{value}}，最大：{{max}}"
+        }
+    },
+    "tabs": {
+        "common": {
+            "furnitureAmount": {
+                "1x": {
+                    "header": "{{number}}x",
+                    "value": "= {{value}}"
+                },
+                "10x": {
+                    "header": "{{number}}x",
+                    "value": "= {{value}}"
+                },
+                "half": {
+                    "header": "半数({{number}})",
+                    "value": "= {{value}}"
+                },
+                "full": {
+                    "header": "总数({{number}})",
+                    "value": "= {{value}}"
+                }
+            },
+            "favouriteButton": {
+                "text": "收藏",
+                "undo": "取消收藏"
+            }
+        },
+        "ships": {
+            "searchPlaceholder": "搜索",
+            "searchExtraButtons": {
+                "cheatsheetButton": {
+                    "text": "参考",
+                    "dialog": {
+                        "table": {
+                            "type": {
+                                "compare": "属性",
+                                "tag": "标签"
+                            },
+                            "header": {
+                                "name": "名称",
+                                "attributeName": "属性名",
+                                "type": "类型",
+                                "others": "其它"
+                            },
+                            "rows": {
+                                "lv": "等级",
+                                "cond": "士气",
+                                "locked": "上锁",
+                                "hp": "HP",
+                                "fire": "火力",
+                                "torpedo": "雷装",
+                                "aa": "对空",
+                                "asw": "对潜",
+                                "armor": "装甲",
+                                "evasion": "回避",
+                                "luck": "运",
+                                "4n": "4n",
+                                "4n1": "4n+1",
+                                "4n2": "4n+2",
+                                "4n3": "4n+3",
+                                "slow": "低速",
+                                "fast": "高速",
+                                "fast+": "高速+",
+                                "fastest": "最速",
+                                "short": "短射程",
+                                "mid": "中射程",
+                                "long": "长射程",
+                                "verylong": "超长射程",
+                                "ijn": "旧日本帝国海军",
+                                "km": "纳粹德国海军",
+                                "rm": "意大利皇家海军",
+                                "mn": "法国海军",
+                                "rn": "英国皇家海军",
+                                "usn": "美国海军",
+                                "vmf": "苏联海军",
+                                "sm": "瑞典海军",
+                                "ran": "澳大利亚皇家海军",
+                                "rnln": "荷兰皇家海军",
+                                "rocn": "中华民国海军"
+                            }
+                        },
+                        "closeButton": "关闭"
+                    }
+                },
+                "helpButton": {
+                    "text": "如何使用？",
+                    "dialogs": {
+                        "basic": {
+                            "content": "如何使用搜索：\n\n入门：\n  直接输入名称即可，如需模糊搜索请在名称前面添加星号\n\n示例：\n  列表：秋月、岛风、照月、初月、照月改、凉月\n\n  照月  -> 精准匹配\"照月\"        -> 照月\n  *月    -> 匹配所有包含\"月\"     -> 秋月、照月、初月、照月改、凉月\n  *照月 -> 匹配所有包含\"照月\" -> 照月、照月改",
+                            "closeButton": "关闭",
+                            "goAdvancedButton": "高级帮助"
+                        },
+                        "advanced": {
+                            "content": "如何使用搜索（高级搜索）：\n\n搜索表达式：\n  [舰种]<舰型>舰名#属性表达式#标签\n  搜索表达式可以用过 && 和 || 进行条件组合，但是不支持通过括号嵌套\n    示例：\n      [AS] || [AV]#fast -> 所有的AS和高速AV\n\n  舰种、舰型、舰名相关说明：\n    舰种、舰型、舰名支持通过 日文、罗马音和中文 进行搜索\n    舰种、舰型、舰名可以自由顺序组合且支持星号进行模糊搜索\n    示例：\n      <*月>[DD]*改二 -> 舰种精准匹配DD且舰型名中包含\"月\"且舰名中包含\"改二\"\n\n  属性表达式、标签相关说明：\n    属性表达式、标签支持通过 罗马音、英文、拼音 进行搜索\n    属性表达式、标签一定要放在单条搜索表达式末尾\n    属性表达式格式为：属性名 操作符 对比值（例：karyoku>=100）\n    属性表达式支持 \"<\"、\"<=\"、\">\"、\">=\"、\"=\"、\"!=\" 进行条件匹配\n    标签不可使用条件匹配（例：#fast#4n）\n    标签可以使用 ! 反向匹配（例：#!ijn）\n    部分属性和标签支持对属性名使用:max、:default修饰标注选择使用当前值/改修前/改修后进行条件匹配（例：karyoku:max>=100）\n    修饰标注列表：\n      :max -> 改修最大值\n      :default -> 改修最小值\n    所有属性和标签参见帮助按钮旁的 \"参考\" 按钮\n    示例：\n      #karyoku:max>150#fast#4n -> 改修后最大火力大于等于150且高速且当前HP符合4n\n      #lv>1#ijn#4n3#!locked -> 等级大于1且舰船国籍为IJN且当前HP符合4n+3且未上锁状态",
+                            "closeButton": "关闭",
+                            "goBasicButton": "入门帮助"
+                        }
+                    }
+                }
+            }
+        },
+        "settings": {
+            "toggleTabs": {
+                "title": "模块开关"
+            }
+        }
+    }
+}

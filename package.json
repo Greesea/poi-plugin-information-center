@@ -1,0 +1,31 @@
+{
+    "name": "poi-plugin-information-center",
+    "version": "0.0.1-beta-1",
+    "author": {
+        "name": "Greesea",
+        "url": "https://github.com/Greesea"
+    },
+    "repository": "https://github.com/Greesea/poi-plugin-information-center",
+    "poiPlugin": {
+        "title": "meta.name",
+        "description": "meta.description",
+        "icon": "fa/newspaper-o"
+    },
+    "dependencies": {
+        "fuse.js": "^6.4.6",
+        "kckit": "^1.58.0"
+    },
+    "devDependencies": {
+        "@blueprintjs/core": "^3.36.0",
+        "classnames": "^2.2.6",
+        "fast-memoize": "^2.5.2",
+        "less": "^4.1.0",
+        "lodash": "^4.17.20",
+        "react": "^17.0.1",
+        "react-bootstrap": "^1.4.3",
+        "react-fontawesome": "^1.7.1",
+        "react-i18next": "^11.8.5",
+        "react-redux": "^7.2.2",
+        "reselect": "^4.0.0"
+    }
+}

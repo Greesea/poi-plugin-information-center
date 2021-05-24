@@ -1,0 +1,134 @@
+{
+    "meta": {
+        "name": "Information Center",
+        "description": "desc-eng"
+    },
+    "root": {
+        "tabs": {
+            "common": "Common",
+            "ships": "Ships",
+            "equipments": "Equipments",
+            "quests": "Quests",
+            "settings": "Settings"
+        }
+    },
+    "translate": {
+        "useItems": {},
+        "ships": {},
+        "equipments": {},
+        "quests": {}
+    },
+    "components": {
+        "shipItem": {
+            "hp": "HP: current:{{value}}, max:{{max}}",
+            "luck": "Luck: default: {{default}}, current: {{value}}, max: {{max}}",
+            "fire": "Fire: default: {{default}}, current: {{value}}, max: {{max}}",
+            "torpedo": "Torpedo: default: {{default}}, current: {{value}}, max: {{max}}"
+        }
+    },
+    "tabs": {
+        "common": {
+            "furnitureAmount": {
+                "1x": {
+                    "header": "{{number}}x",
+                    "value": "= {{value}}"
+                },
+                "10x": {
+                    "header": "{{number}}x",
+                    "value": "= {{value}}"
+                },
+                "half": {
+                    "header": "Half ({{number}})",
+                    "value": "= {{value}}"
+                },
+                "full": {
+                    "header": "Total ({{number}})",
+                    "value": "= {{value}}"
+                }
+            },
+            "favouriteButton": {
+                "text": "Favourite",
+                "undo": "Undo"
+            }
+        },
+        "ships": {
+            "searchPlaceholder": "Search",
+            "searchExtraButtons": {
+                "cheatsheetButton": {
+                    "text": "Cheatsheet",
+                    "dialog": {
+                        "table": {
+                            "type": {
+                                "compare": "compare",
+                                "tag": "tag"
+                            },
+                            "header": {
+                                "name": "Name",
+                                "attributeName": "Attribute Name",
+                                "type": "Type",
+                                "others": "Others"
+                            },
+                            "rows": {
+                                "lv": "Lv",
+                                "cond": "Cond",
+                                "locked": "Locked",
+                                "hp": "HP",
+                                "fire": "Fire",
+                                "torpedo": "Torpedo",
+                                "aa": "AA",
+                                "asw": "ASW",
+                                "armor": "Armor",
+                                "evasion": "Evasion",
+                                "luck": "Luck",
+                                "4n": "4n",
+                                "4n1": "4n+1",
+                                "4n2": "4n+2",
+                                "4n3": "4n+3",
+                                "slow": "Slow",
+                                "fast": "Fast",
+                                "fast+": "Fast+",
+                                "fastest": "Fastest",
+                                "short": "Short Range",
+                                "mid": "Mid Range",
+                                "long": "Long Range",
+                                "verylong": "Very Long Range",
+                                "ijn": "Imperial Japanese Navy",
+                                "km": "'Kriegsmarine",
+                                "rm": "Regia Marina",
+                                "mn": "Marine nationale",
+                                "rn": "Royal Navy",
+                                "usn": "United States Navy",
+                                "vmf": "Soviet Navy",
+                                "sm": "Swedish Royal Navy",
+                                "ran": "Royal Australian Navy",
+                                "rnln": "Royal Netherlands Navy",
+                                "rocn": "The Republic of China Navy"
+                            }
+                        },
+                        "closeButton": "Close"
+                    }
+                },
+                "helpButton": {
+                    "text": "How to use?",
+                    "dialogs": {
+                        "basic": {
+                            "content": "[WIP] basic, need translate",
+                            "closeButton": "Close",
+                            "goAdvancedButton": "Advanced Tutorial"
+                        },
+                        "advanced": {
+                            "content": "[WIP] advanced, need translate",
+                            "closeButton": "Close",
+                            "goBasicButton": "Basic Tutorial"
+                        }
+                    }
+                }
+            }
+        },
+        "settings": {
+            "toggleTabs": {
+                "title": "Toggle Module"
+            }
+        }
+    }
+}
