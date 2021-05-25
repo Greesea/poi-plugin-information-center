@@ -1,4 +1,5 @@
 .idea
-*.bak
+node_modules
 
-/assets/lessVariables.css*
+*.bak
+/assets/*.css*
