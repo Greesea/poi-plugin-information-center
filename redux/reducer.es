@@ -5,6 +5,7 @@ import {EXTENSION_KEY} from "../views/constants.es";
 import {pluginSettingsSelector, pluginSettingsSet} from "./selectors.es";
 import {createSelector} from "reselect";
 import {tabsIdList as ROOT_TABS_ID_LIST} from "../views/tabs/loader.es";
+import {debugConsole} from "../views/lib/debug/index.es";
 
 //region tab-common
 const pluginSettingsTabCommonUseItemsFavouritesSelector = createSelector([pluginSettingsSelector], settings => settings?.tabs?.common?.useItemsFavourites ?? []);
@@ -17,7 +18,7 @@ const pluginSettingsTabSettingsRootTabsSelector = createSelector([pluginSettings
 export default (state = {}, action, store) => {
     const {type} = action;
 
-    console.log(`[track] on action "${type}"`);
+    debugConsole().log(`on action "${type}"`);
 
     //region core
     if (type === `@@${EXTENSION_KEY}@__update__`) {

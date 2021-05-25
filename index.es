@@ -2,7 +2,7 @@ import path from "path";
 import React, {useState, useEffect} from "react";
 import {connect} from "react-redux";
 import {createSelector} from "reselect";
-import "./views/lib/debug/index";
+import {debugEnable, debugCleanup, debugConsole} from "./views/lib/debug/index.es";
 
 import Entry from "./views/index";
 import {infoSelector} from "./redux/selectors.es";
@@ -54,10 +54,11 @@ const mapDispatchToProps = dispatch => ({
     },
 });
 
+debugEnable();
 export const reactClass = connect(mapStateToProps, mapDispatchToProps)(function (props) {
     const [initTrigger] = useState(0);
     useEffect(() => {
-        console.log("[track] core update");
+        debugConsole().log("core update");
         props?.init(props.initData);
     }, [initTrigger]);
 
@@ -66,3 +67,6 @@ export const reactClass = connect(mapStateToProps, mapDispatchToProps)(function 
     )
 });
 export {default as reducer} from "./redux/reducer";
+export const pluginWillUnload = () => {
+    debugCleanup();
+};
