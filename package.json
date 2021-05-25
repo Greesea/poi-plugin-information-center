@@ -6,6 +6,10 @@
         "url": "https://github.com/Greesea"
     },
     "license": "MIT",
+    "keywords": [
+        "kancolle",
+        "poi-plugin"
+    ],
     "repository": "https://github.com/Greesea/poi-plugin-information-center",
     "poiPlugin": {
         "title": "meta.name",
