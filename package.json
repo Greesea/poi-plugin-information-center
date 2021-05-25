@@ -5,6 +5,7 @@
         "name": "Greesea",
         "url": "https://github.com/Greesea"
     },
+    "license": "MIT",
     "repository": "https://github.com/Greesea/poi-plugin-information-center",
     "poiPlugin": {
         "title": "meta.name",
