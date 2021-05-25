@@ -11,11 +11,11 @@ import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import ShipItem from "../../components/shipItem/index";
 
-import {EXTENSION_KEY, constSelector, infoSelector, pluginDataSelector, pluginSettingsSelector, pluginResourceSelector} from "../../../redux/selectors.es";
+import {constSelector, infoSelector, pluginDataSelector, pluginSettingsSelector, pluginResourceSelector} from "../../../redux/selectors.es";
 import {compare} from "../../utils.es";
 import {playerShipDataFactory} from "../../lib/dataFactory/ship.es";
 import {matcher, matcherMarkupTypes, parseMatcherRules} from "../../lib/matcher/index.es";
-import {LANGUAGE, RES} from "../../constants.es";
+import {EXTENSION_KEY, LANGUAGE, RES} from "../../constants.es";
 
 const shipsSelector = createSelector([infoSelector], info => info.ships);
 

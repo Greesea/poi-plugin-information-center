@@ -5,8 +5,9 @@ import {createSelector} from "reselect";
 
 import "./index.css";
 import {Tab, Tabs} from "@blueprintjs/core";
-import {EXTENSION_KEY, pluginSettingsSelector} from "../redux/selectors.es";
+import {pluginSettingsSelector} from "../redux/selectors.es";
 import {tabs as ROOT_TABS, tabsIdList as ROOT_TABS_ID_LIST} from "./tabs/loader.es";
+import {EXTENSION_KEY} from "./constants.es";
 
 const pluginSettingsTabSettingsRootTabsSelector = createSelector([pluginSettingsSelector], settings => settings?.root?.tabs ?? ROOT_TABS_ID_LIST);
 const selector = createSelector([pluginSettingsSelector, pluginSettingsTabSettingsRootTabsSelector], (settings, settingsRootTabs) => {

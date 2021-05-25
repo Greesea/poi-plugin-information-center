@@ -1,7 +1,8 @@
 import kckit from "kckit";
 import kckitDataSource from "../views/lib/kckit/dataSource";
 
-import {EXTENSION_KEY, pluginSettingsSelector, pluginSettingsSet} from "./selectors.es";
+import {EXTENSION_KEY} from "../views/constants.es";
+import {pluginSettingsSelector, pluginSettingsSet} from "./selectors.es";
 import {createSelector} from "reselect";
 import {tabsIdList as ROOT_TABS_ID_LIST} from "../views/tabs/loader.es";
 

@@ -7,7 +7,8 @@ import {t} from "../../i18n.es";
 import "./index.css";
 import {Tooltip} from "@blueprintjs/core";
 import FA from "react-fontawesome"
-import {EXTENSION_KEY, constSelector, infoSelector, pluginSettingsSelector, pluginResourceSelector} from "../../../redux/selectors.es";
+import {constSelector, infoSelector, pluginSettingsSelector, pluginResourceSelector} from "../../../redux/selectors.es";
+import {EXTENSION_KEY} from "../../constants.es";
 
 //region 特殊处理
 class ExtraInfoFurniture {

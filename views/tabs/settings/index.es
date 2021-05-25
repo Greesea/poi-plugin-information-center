@@ -6,8 +6,9 @@ import {t} from "../../i18n.es";
 
 import "./index.css";
 import {Card, Elevation, Switch} from "@blueprintjs/core";
-import {EXTENSION_KEY, pluginSettingsSelector} from "../../../redux/selectors.es";
+import {pluginSettingsSelector} from "../../../redux/selectors.es";
 import {tabsList as ROOT_TABS_LIST, tabsIdList as ROOT_TABS_ID_LIST} from "../loader.es";
+import {EXTENSION_KEY} from "../../constants.es";
 
 const pluginSettingsTabSettingsRootTabsSelector = createSelector([pluginSettingsSelector], settings => settings?.root?.tabs ?? ROOT_TABS_ID_LIST);
 const selector = createSelector([pluginSettingsSelector, pluginSettingsTabSettingsRootTabsSelector], (settings, settingsRootTabs) => ({

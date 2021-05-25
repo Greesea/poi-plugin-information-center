@@ -5,10 +5,10 @@ import {createSelector} from "reselect";
 import "./views/lib/debug/index";
 
 import Entry from "./views/index";
-import {EXTENSION_KEY, infoSelector} from "./redux/selectors.es";
+import {infoSelector} from "./redux/selectors.es";
 import {wctfSelector} from "views/utils/selectors";
 import {network, resourceType} from "./views/utils.es";
-import {RES} from "./views/constants.es";
+import {EXTENSION_KEY, RES} from "./views/constants.es";
 
 const serverIpSelector = createSelector([infoSelector], info => info?.server?.ip);
 const selector = createSelector(

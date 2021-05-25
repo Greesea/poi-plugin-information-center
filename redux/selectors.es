@@ -1,8 +1,7 @@
 import _ from "lodash";
 import {createSelector} from "reselect";
 import {stateSelector as poiStateSelector, constSelector as poiConstSelector, extensionSelectorFactory} from "views/utils/selectors";
-
-export const EXTENSION_KEY = "poi-plugin-information-center";
+import {EXTENSION_KEY} from "../views/constants.es";
 
 export const stateSelector = poiStateSelector;
 export const constSelector = poiConstSelector;

@@ -2,6 +2,8 @@ import _ from "lodash";
 import {POI_ROOT} from "./utils.es";
 
 export const LANGUAGE = (window.language || "").toLowerCase().replace("-", "_");
+export const EXTENSION_KEY = "poi-plugin-information-center";
+export const EXTENSION_NAME = "informationCenter";
 
 export const RES = {
     IMAGE_COMMON_ITEMICONS: "/kcs2/img/common/common_itemicons.png",
