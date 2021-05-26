@@ -3,15 +3,23 @@ import React, {useState, useEffect} from "react";
 import {t} from "../../i18n.es";
 
 import {Avatar} from "views/components/etc/avatar";
+import {getShipAvatarColorByTag} from "views/utils/game-utils";
 import {Tooltip} from "@blueprintjs/core";
 
 import {LANGUAGE, RES} from "../../constants.es";
 
 function ShipItem(props) {
     let item = props.item;
+    let sallyColors = props.config?.fcdShipTagColor;
 
     return (
         <div className="shipItem">
+            {
+                sallyColors && sallyColors.length && item.sally ?
+                    <div className="accent" style={{background: `linear-gradient(to left, transparent, ${getShipAvatarColorByTag(item.sally, sallyColors)})`}}></div> :
+                    <></>
+            }
+
             <div className="avatar">
                 <Avatar mstId={item.shipId} height={46}></Avatar>
             </div>

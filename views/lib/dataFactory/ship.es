@@ -28,6 +28,8 @@ export const playerShipDataFactory = playerShipRaw => {
     data.locked = playerShipRaw.api_locked;
     data.navy = data.ship?.getNavy();
 
+    data.sally = playerShipRaw.api_sally_area;
+
     data.hp = Object.create(null);
     data.hp.value = playerShipRaw.api_nowhp;
     data.hp.max = playerShipRaw.api_maxhp;

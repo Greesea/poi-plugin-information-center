@@ -1,10 +1,18 @@
 import _ from "lodash";
 import {createSelector} from "reselect";
-import {stateSelector as poiStateSelector, constSelector as poiConstSelector, extensionSelectorFactory} from "views/utils/selectors";
+import {
+    stateSelector as poiStateSelector,
+    constSelector as poiConstSelector,
+    extensionSelectorFactory,
+    fcdSelector as poiFcdSelector,
+    fcdShipTagColorSelector as poiFcdShipTagColorSelector
+} from "views/utils/selectors";
 import {EXTENSION_KEY} from "../views/constants.es";
 
 export const stateSelector = poiStateSelector;
 export const constSelector = poiConstSelector;
+export const fcdSelector = poiFcdSelector;
+export const fcdShipTagColorSelector = poiFcdShipTagColorSelector;
 export const infoSelector = state => state?.info;
 
 export const pluginDataSelector = createSelector(extensionSelectorFactory(EXTENSION_KEY), state => state || {});

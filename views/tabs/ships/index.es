@@ -11,7 +11,7 @@ import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import ShipItem from "../../components/shipItem/index";
 
-import {constSelector, infoSelector, pluginDataSelector, pluginSettingsSelector, pluginResourceSelector} from "../../../redux/selectors.es";
+import {constSelector, infoSelector, pluginDataSelector, pluginSettingsSelector, pluginResourceSelector, fcdShipTagColorSelector} from "../../../redux/selectors.es";
 import {compare} from "../../utils.es";
 import {playerShipDataFactory} from "../../lib/dataFactory/ship.es";
 import {matcher, matcherMarkupTypes, parseMatcherRules} from "../../lib/matcher/index.es";
@@ -349,11 +349,14 @@ const playerShipsMatchByRulesSelector = createSelector([playerShipsSelector, sea
 //endregion
 
 const selector = createSelector(
-    [constSelector, infoSelector, searchBarInputSelector, playerShipsMatchByRulesSelector],
-    (constData, info, searchBarInput, matchedShips) => {
+    [constSelector, infoSelector, searchBarInputSelector, playerShipsMatchByRulesSelector, fcdShipTagColorSelector],
+    (constData, info, searchBarInput, matchedShips, fcdShipTagColor) => {
         return {
             searchBarInput,
-            matchedShips
+            matchedShips,
+            shipRenderConfig: {
+                fcdShipTagColor,
+            },
         };
     }
 );
@@ -384,7 +387,7 @@ const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
     let listRowItem = ({index, isScrolling, isVisible, key, parent, style}) => {
         return (
             <div key={key} style={style}>
-                <ShipItem item={props.matchedShips[index]}/>
+                <ShipItem item={props.matchedShips[index]} config={props.shipRenderConfig}/>
             </div>
         )
     };
