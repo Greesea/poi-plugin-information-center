@@ -1,8 +1,9 @@
 .shipItem {
   display: flex;
   margin-bottom: 4px;
+  padding-right: 4px;
   height: 46px;
-  background: rgba(0, 0, 0, 0.075);
+  background: rgba(0, 0, 0, 0.07);
 }
 .shipItem .avatar {
   flex-shrink: 0;
@@ -44,12 +45,14 @@
   flex-shrink: 0;
   flex-basis: 24%;
 }
+.shipItem .info > .bp3-popover-wrapper {
+  flex-basis: 48%;
+  flex-shrink: 0;
+}
 .shipItem .info .info-item {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  flex-basis: 48%;
-  flex-shrink: 0;
 }
 .shipItem .info .info-item .icon {
   width: 20px;
