@@ -37,7 +37,7 @@ export const playerShipDataFactory = playerShipRaw => {
     data.locked = playerShipRaw.api_locked;
     data.navy = data.ship?.getNavy();
 
-    data.sally = playerShipRaw.api_sally_area;
+    data.sally = playerShipRaw.api_sally_area ?? 0;
 
     data.hp = Object.create(null);
     data.hp.value = playerShipRaw.api_nowhp;

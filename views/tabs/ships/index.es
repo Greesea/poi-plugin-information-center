@@ -172,13 +172,12 @@ const shipMatcher = {
                 attr[0] = (attr[0] ?? "").toLowerCase();
 
                 switch (attr[0]) {
+                    case "id":
                     case "lv":
                     case "cond":
                         if (compareItem.value == null || compareItem.value === "")
                             return;
                         return compare(item[attr[0]], _.toNumber(compareItem.value), compareItem.operator);
-                    case "locked":
-                        return compare(item.locked, 1, compareItem.operator, compareItem.isNotEqualTag);
                     case "hp":
                         if (compareItem.value == null)
                             return;
@@ -188,6 +187,14 @@ const shipMatcher = {
                             default:
                                 return compare(item.hp.value, _.toNumber(compareItem.value), compareItem.operator);
                         }
+                    case "slot":
+                        if (compareItem.value == null || compareItem.value === "")
+                            return;
+                        return compare(item.ship?.slot?.length ?? 0, _.toNumber(compareItem.value), compareItem.operator);
+                    case "event":
+                        if (compareItem.value == null || compareItem.value === "")
+                            return;
+                        return compare(item.sally, _.toNumber(compareItem.value), compareItem.operator);
 
                     //region fire
                     case "ka":
@@ -297,6 +304,11 @@ const shipMatcher = {
                         }
                     //endregion
 
+                    //region lock
+                    case "lock":
+                    case "locked":
+                        return compare(item.locked, 1, compareItem.operator, compareItem.isNotEqualTag);
+                    //endregion
                     //region 4n
                     case "4n":
                     case "4n1":
