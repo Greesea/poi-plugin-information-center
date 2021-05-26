@@ -14,7 +14,16 @@ export const playerShipDataFactory = playerShipRaw => {
     data.shipClass = kckit.get.shipClass(data.ship?.class);
 
     data.search = Object.create(null);
-    data.search.shipName = _.filter(_.map(Object.keys(data.ship.name), key => key === "suffix" ? null : data.ship.getName("", key)));
+    data.search.shipName = _.uniq(
+        _.filter(
+            _.flatten(
+                _.map(
+                    Object.keys(data.ship.name),
+                    key => key === "suffix" ? null : [data.ship.name[key], data.ship.getName("", key)]
+                )
+            )
+        )
+    );
     data.search.shipType = _.filter([data.shipType.code].concat(_.map(Object.keys(data.shipType.name), key => data.shipType.getName(key))));
     data.search.shipClass = _.filter(_.map(Object.keys(data.shipClass.name), key => data.shipClass.getName(key)));
 

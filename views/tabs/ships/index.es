@@ -77,43 +77,93 @@ const shipMatcher = {
     extractors: {
         [matcherMarkupTypes.brackets]: (pool, ruleItem) => {
             let content = ruleItem.content;
-            let fuzzy = content.startsWith("*");
-            if (fuzzy)
-                content = content.substring(1);
+            let searchPattern = "";
+            let minLength = content.length;
+
+            let firstChar = (content || "")[0];
+            switch (firstChar) {
+                case "'": // include match
+                case "!": // inverse-exact match
+                    searchPattern = `${firstChar}"${content.substring(1)}"`;
+                    minLength--;
+                    break;
+                case "*": // fuzzy match
+                    searchPattern = `"${content.substring(1)}"`;
+                    minLength--;
+                    break;
+                default: // exact match
+                    searchPattern = `="${content}"`;
+                    break;
+                case "$": // custom rule
+                    searchPattern = content.substring(1);
+                    minLength = 1;
+                    break;
+            }
 
             return new Fuse(pool, {
                 keys: ["search.shipType"],
-                minMatchCharLength: content.length,
+                minMatchCharLength: minLength,
                 useExtendedSearch: true,
-            }).search(`${fuzzy ? "'" : "="}"${content}"`).map(resultItem => resultItem.item);
+            }).search(searchPattern).map(resultItem => resultItem.item);
         },
         [matcherMarkupTypes.chevrons]: (pool, ruleItem) => {
             let content = ruleItem.content;
-            let fuzzy = content.startsWith("*");
-            if (fuzzy)
-                content = content.substring(1);
+            let searchPattern = "";
+            let minLength = content.length;
+
+            let firstChar = (content || "")[0];
+            switch (firstChar) {
+                case "'": // include match
+                case "!": // inverse-exact match
+                    searchPattern = `${firstChar}"${content.substring(1)}"`;
+                    minLength--;
+                    break;
+                case "*": // fuzzy match
+                    searchPattern = `"${content.substring(1)}"`;
+                    minLength--;
+                    break;
+                default: // exact match
+                    searchPattern = `="${content}"`;
+                    break;
+                case "$": // custom rule
+                    searchPattern = content.substring(1);
+                    minLength = 1;
+                    break;
+            }
 
             return new Fuse(pool, {
                 keys: ["search.shipClass"],
-                minMatchCharLength: content.length,
+                minMatchCharLength: minLength,
                 useExtendedSearch: true,
-            }).search(`${fuzzy ? "'" : "="}"${content}"`).map(resultItem => resultItem.item);
+            }).search(searchPattern).map(resultItem => resultItem.item);
         },
-        // [matcherMarkupTypes.plain]: (pool, ruleItem) =>
-        //     new Fuse(pool, {
-        //         keys: ["search.shipName"]
-        //     }).search(ruleItem.content).map(resultItem => resultItem.item),
         [matcherMarkupTypes.plain]: (pool, ruleItem) => {
             let content = ruleItem.content;
-            let fuzzy = content.startsWith("*");
-            if (fuzzy)
-                content = content.substring(1);
+            let searchPattern = "";
+            let minLength = content.length;
+
+            let firstChar = (content || "")[0];
+            switch (firstChar) {
+                case "=": // exact match
+                case "'": // include match
+                case "!": // inverse-exact match
+                    searchPattern = `${firstChar}"${content.substring(1)}"`;
+                    minLength--;
+                    break;
+                default: // fuzzy match
+                    searchPattern = `"${content}"`;
+                    break;
+                case "$": // custom rule
+                    searchPattern = content.substring(1);
+                    minLength = 1;
+                    break;
+            }
 
             return new Fuse(pool, {
                 keys: ["search.shipName"],
-                minMatchCharLength: content.length,
+                minMatchCharLength: minLength,
                 useExtendedSearch: true,
-            }).search(`${fuzzy ? "'" : "="}"${content}"`).map(resultItem => resultItem.item);
+            }).search(searchPattern).map(resultItem => resultItem.item);
         },
         [matcherMarkupTypes.compare]: (pool, ruleItem) => {
             let compareItem = ruleItem.compare;
@@ -326,6 +376,8 @@ const shipMatcher = {
 const playerShipsSelector = createSelector([shipsSelector], ships => _.map(ships, item => playerShipDataFactory(item)));
 const searchBarInputSelector = createSelector([pluginDataSelector], pluginData => _.get(pluginData, "cache.ships.searchBarInput"))
 const playerShipsMatchByRulesSelector = createSelector([playerShipsSelector, searchBarInputSelector], (playerShips, searchBarInput) => {
+    //TODO add sort support
+
     return _.flatten(
         _.reduce(
             matcher(playerShips, {
@@ -658,6 +710,7 @@ const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
             <div className="list">
                 <AutoSizer>
                     {({width, height}) => {
+                        console.log(props.matchedShips);
                         return (
                             <List
                                 width={width}
