@@ -16,12 +16,36 @@ import {compare} from "../../utils.es";
 import {playerShipDataFactory} from "../../lib/dataFactory/ship.es";
 import {matcher, matcherMarkupTypes, parseMatcherRules} from "../../lib/matcher/index.es";
 import {EXTENSION_KEY, LANGUAGE, RES} from "../../constants.es";
+import {debugConsole} from "../../lib/debug/index.es";
 
 const shipsSelector = createSelector([infoSelector], info => info.ships);
 
 //region selector - ships
 const shipMatcher = {
     enums: {
+        attributes: {
+            id: 1,
+            lv: 2,
+            cond: 3,
+            slot: 4,
+            event: 5,
+
+            hp: 6,
+            fire: 7,
+            torpedo: 8,
+            aa: 9,
+            asw: 10,
+            armor: 11,
+            evasion: 12,
+            luck: 13,
+
+            lock: 14,
+            "4n": 15,
+            speed: 16,
+            range: 17,
+            navy: 18,
+        },
+
         mod4: {
             "4n": 0,
             "4n1": 1,
@@ -74,317 +98,213 @@ const shipMatcher = {
             "verylong": 4,
         },
     },
-    extractors: {
-        [matcherMarkupTypes.brackets]: (pool, ruleItem) => {
-            let content = ruleItem.content;
-            let searchPattern = "";
-            let minLength = content.length;
-
-            let firstChar = (content || "")[0];
-            switch (firstChar) {
-                case "'": // include match
-                case "!": // inverse-exact match
-                    searchPattern = `${firstChar}"${content.substring(1)}"`;
-                    minLength--;
-                    break;
-                case "*": // fuzzy match
-                    searchPattern = `"${content.substring(1)}"`;
-                    minLength--;
-                    break;
-                default: // exact match
-                    searchPattern = `="${content}"`;
-                    break;
-                case "$": // custom rule
-                    searchPattern = content.substring(1);
-                    minLength = 1;
-                    break;
-            }
-
-            return new Fuse(pool, {
-                keys: ["search.shipType"],
-                minMatchCharLength: minLength,
-                useExtendedSearch: true,
-            }).search(searchPattern).map(resultItem => resultItem.item);
-        },
-        [matcherMarkupTypes.chevrons]: (pool, ruleItem) => {
-            let content = ruleItem.content;
-            let searchPattern = "";
-            let minLength = content.length;
-
-            let firstChar = (content || "")[0];
-            switch (firstChar) {
-                case "'": // include match
-                case "!": // inverse-exact match
-                    searchPattern = `${firstChar}"${content.substring(1)}"`;
-                    minLength--;
-                    break;
-                case "*": // fuzzy match
-                    searchPattern = `"${content.substring(1)}"`;
-                    minLength--;
-                    break;
-                default: // exact match
-                    searchPattern = `="${content}"`;
-                    break;
-                case "$": // custom rule
-                    searchPattern = content.substring(1);
-                    minLength = 1;
-                    break;
-            }
-
-            return new Fuse(pool, {
-                keys: ["search.shipClass"],
-                minMatchCharLength: minLength,
-                useExtendedSearch: true,
-            }).search(searchPattern).map(resultItem => resultItem.item);
-        },
-        [matcherMarkupTypes.plain]: (pool, ruleItem) => {
-            let content = ruleItem.content;
-            let searchPattern = "";
-            let minLength = content.length;
-
-            let firstChar = (content || "")[0];
-            switch (firstChar) {
-                case "=": // exact match
-                case "'": // include match
-                case "!": // inverse-exact match
-                    searchPattern = `${firstChar}"${content.substring(1)}"`;
-                    minLength--;
-                    break;
-                default: // fuzzy match
-                    searchPattern = `"${content}"`;
-                    break;
-                case "$": // custom rule
-                    searchPattern = content.substring(1);
-                    minLength = 1;
-                    break;
-            }
-
-            return new Fuse(pool, {
-                keys: ["search.shipName"],
-                minMatchCharLength: minLength,
-                useExtendedSearch: true,
-            }).search(searchPattern).map(resultItem => resultItem.item);
-        },
-        [matcherMarkupTypes.compare]: (pool, ruleItem) => {
-            let compareItem = ruleItem.compare;
-            return _.filter(pool, item => {
-                let attr = compareItem.attr.split(":").map(str => str.trim());
-                attr[0] = (attr[0] ?? "").toLowerCase();
-
-                switch (attr[0]) {
-                    case "id":
-                    case "lv":
-                    case "cond":
+    featureConfig: {
+        compareAndTags: {
+            functionGenerator: {
+                compareByAttr: (valueAttr) => {
+                    return (ruleItem, compareItem, item, attr) => {
                         if (compareItem.value == null || compareItem.value === "")
                             return;
-                        return compare(item[attr[0]], _.toNumber(compareItem.value), compareItem.operator);
-                    case "hp":
+                        return compare(item[valueAttr], _.toNumber(compareItem.value), compareItem.operator);
+                    }
+                },
+                compareByAttrWithDefaultAndMax: (valueAttr) => {
+                    return (ruleItem, compareItem, item, attr) => {
                         if (compareItem.value == null)
                             return;
                         switch (attr[1]) {
-                            case "max":
-                                return compare(item.hp[attr[1]], _.toNumber(compareItem.value), compareItem.operator);
-                            default:
-                                return compare(item.hp.value, _.toNumber(compareItem.value), compareItem.operator);
-                        }
-                    case "slot":
-                        if (compareItem.value == null || compareItem.value === "")
-                            return;
-                        return compare(item.ship?.slot?.length ?? 0, _.toNumber(compareItem.value), compareItem.operator);
-                    case "event":
-                        if (compareItem.value == null || compareItem.value === "")
-                            return;
-                        return compare(item.sally, _.toNumber(compareItem.value), compareItem.operator);
-
-                    //region fire
-                    case "ka":
-                    case "karyoku":
-                    case "huo":
-                    case "huoli":
-                    case "fire":
-                        if (compareItem.value == null || compareItem.value === "")
-                            return;
-                        switch (attr[1]) {
                             case "default":
                             case "max":
-                                return compare(item.fire[attr[1]], _.toNumber(compareItem.value), compareItem.operator);
+                                return compare(item[valueAttr][attr[1]], _.toNumber(compareItem.value), compareItem.operator);
                             default:
-                                return compare(item.fire.value, _.toNumber(compareItem.value), compareItem.operator);
+                                return compare(item[valueAttr].value, _.toNumber(compareItem.value), compareItem.operator);
                         }
-                    //endregion
-                    //region torpedo
-                    case "rai":
-                    case "raisou":
-                    case "lei":
-                    case "leizhuang":
-                    case "torpedo":
-                        if (compareItem.value == null || compareItem.value === "")
-                            return;
+                    }
+                },
+                tagByAttrAndEnum: (valueAttr, enumAttr = valueAttr) => {
+                    return (ruleItem, compareItem, item, attr) => {
                         switch (attr[1]) {
                             case "default":
-                            case "max":
-                                return compare(item.torpedo[attr[1]], _.toNumber(compareItem.value), compareItem.operator);
+                                return compare(item[valueAttr][attr[1]], shipMatcher.enums[enumAttr][attr[0]], compareItem.operator, compareItem.isNotEqualTag);
                             default:
-                                return compare(item.torpedo.value, _.toNumber(compareItem.value), compareItem.operator);
+                                return compare(item[valueAttr].value, shipMatcher.enums[enumAttr][attr[0]], compareItem.operator, compareItem.isNotEqualTag);
                         }
-                    //endregion
-                    //region aa
-                    case "kuu":
-                    case "taiku":
-                    case "kong":
-                    case "duikong":
-                    case "aa":
-                        if (compareItem.value == null || compareItem.value === "")
-                            return;
-                        switch (attr[1]) {
-                            case "default":
-                            case "max":
-                                return compare(item.aa[attr[1]], _.toNumber(compareItem.value), compareItem.operator);
-                            default:
-                                return compare(item.aa.value, _.toNumber(compareItem.value), compareItem.operator);
-                        }
-                    //endregion
-                    //region asw
-                    case "sen":
-                    case "taisen":
-                    case "qian":
-                    case "duiqian":
-                    case "asw":
-                        if (compareItem.value == null || compareItem.value === "")
-                            return;
-                        switch (attr[1]) {
-                            case "default":
-                            case "max":
-                                return compare(item.asw[attr[1]], _.toNumber(compareItem.value), compareItem.operator);
-                            default:
-                                return compare(item.asw.value, _.toNumber(compareItem.value), compareItem.operator);
-                        }
-                    //endregion
-                    //region armor
-                    case "soukou":
-                    case "jia":
-                    case "zhuangjia":
-                    case "armor":
-                        if (compareItem.value == null || compareItem.value === "")
-                            return;
-                        switch (attr[1]) {
-                            case "default":
-                            case "max":
-                                return compare(item.armor[attr[1]], _.toNumber(compareItem.value), compareItem.operator);
-                            default:
-                                return compare(item.armor.value, _.toNumber(compareItem.value), compareItem.operator);
-                        }
-                    //endregion
-                    //region evasion
-                    case "kaihi":
-                    case "huibi":
-                    case "evasion":
-                        if (compareItem.value == null || compareItem.value === "")
-                            return;
-                        switch (attr[1]) {
-                            case "default":
-                            case "max":
-                                return compare(item.evasion[attr[1]], _.toNumber(compareItem.value), compareItem.operator);
-                            default:
-                                return compare(item.evasion.value, _.toNumber(compareItem.value), compareItem.operator);
-                        }
-                    //endregion
-                    //region luck
-                    case "un":
-                    case "yun":
-                    case "luck":
-                        if (compareItem.value == null || compareItem.value === "")
-                            return;
-                        switch (attr[1]) {
-                            case "default":
-                            case "max":
-                                return compare(item.luck[attr[1]], _.toNumber(compareItem.value), compareItem.operator);
-                            default:
-                                return compare(item.luck.value, _.toNumber(compareItem.value), compareItem.operator);
-                        }
-                    //endregion
-
-                    //region lock
-                    case "lock":
-                    case "locked":
-                        return compare(item.locked, 1, compareItem.operator, compareItem.isNotEqualTag);
-                    //endregion
-                    //region 4n
-                    case "4n":
-                    case "4n1":
-                    case "4n2":
-                    case "4n3":
-                        return compare(item.hp.mod4, shipMatcher.enums.mod4[attr[0]], compareItem.operator, compareItem.isNotEqualTag);
-                    //endregion
-                    //region speed
-                    case "tei":
-                    case "teisoku":
-                    case "di":
-                    case "disu":
-                    case "slow":
-                    case "kou":
-                    case "kousoku":
-                    case "gao":
-                    case "gaosu":
-                    case "fast":
-                    case "kou+":
-                    case "kousoku+":
-                    case "gao+":
-                    case "gaosu+":
-                    case "fast+":
-                    case "sai":
-                    case "saisoku":
-                    case "zui":
-                    case "zuisu":
-                    case "fastest":
-                        switch (attr[1]) {
-                            case "default":
-                                return compare(item.speed[attr[1]], shipMatcher.enums.speed[attr[0]], compareItem.operator, compareItem.isNotEqualTag);
-                            default:
-                                return compare(item.speed.value, shipMatcher.enums.speed[attr[0]], compareItem.operator, compareItem.isNotEqualTag);
-                        }
-                    //endregion
-                    //region range
-                    case "tan":
-                    case "duan":
-                    case "short":
-                    case "chuu":
-                    case "zhong":
-                    case "mid":
-                    case "cho":
-                    case "naga":
-                    case "chang":
-                    case "long":
-                    case "chocho":
-                    case "chonaga":
-                    case "chao":
-                    case "chaochang":
-                    case "verylong":
-                        switch (attr[1]) {
-                            case "default":
-                                return compare(item.range[attr[1]], shipMatcher.enums.range[attr[0]], compareItem.operator, compareItem.isNotEqualTag);
-                            default:
-                                return compare(item.range.value, shipMatcher.enums.range[attr[0]], compareItem.operator, compareItem.isNotEqualTag);
-                        }
-                    //endregion
-                    //region navy
-                    case "ijn":
-                    case "km":
-                    case "rm":
-                    case "mn":
-                    case "rn":
-                    case "usn":
-                    case "vmf":
-                    case "ran":
-                    case "rnln":
-                    case "rocn":
-                        return compare(item.navy, attr[0], compareItem.operator, compareItem.isNotEqualTag);
-                    //endregion
-                }
-            });
+                    }
+                },
+            },
         },
-    }
+    },
 };
+shipMatcher.enums.attributeAlias = {
+    [shipMatcher.enums.attributes.id]: ["id"],
+    [shipMatcher.enums.attributes.lv]: ["lv"],
+    [shipMatcher.enums.attributes.cond]: ["cond"],
+    [shipMatcher.enums.attributes.slot]: ["slot"],
+    [shipMatcher.enums.attributes.event]: ["event"],
+
+    [shipMatcher.enums.attributes.hp]: ["hp"],
+    [shipMatcher.enums.attributes.fire]: ["ka", "karyoku", "huo", "huoli", "fire"],
+    [shipMatcher.enums.attributes.torpedo]: ["rai", "raisou", "lei", "leizhuang", "torpedo"],
+    [shipMatcher.enums.attributes.aa]: ["kuu", "taiku", "kong", "duikong", "aa"],
+    [shipMatcher.enums.attributes.asw]: ["sen", "taisen", "qian", "duiqian", "asw"],
+    [shipMatcher.enums.attributes.armor]: ["soukou", "jia", "zhuangjia", "armor"],
+    [shipMatcher.enums.attributes.evasion]: ["kaihi", "huibi", "evasion"],
+    [shipMatcher.enums.attributes.luck]: ["un", "yun", "luck"],
+
+    [shipMatcher.enums.attributes.lock]: ["lock", "locked"],
+    [shipMatcher.enums.attributes["4n"]]: ["4n", "4n1", "4n2", "4n3"],
+    [shipMatcher.enums.attributes.speed]: ["tei", "teisoku", "di", "disu", "slow", "kou", "kousoku", "gao", "gaosu", "fast", "kou", "kousoku", "gao", "gaosu", "fast", "sai", "saisoku", "zui", "zuisu", "fastest"],
+    [shipMatcher.enums.attributes.range]: ["tan", "duan", "short", "chuu", "zhong", "mid", "cho", "naga", "chang", "long", "chocho", "chonaga", "chao", "chaochang", "verylong"],
+    [shipMatcher.enums.attributes.navy]: ["ijn", "km", "rm", "mn", "rn", "usn", "vmf", "ran", "rnln", "rocn"],
+};
+shipMatcher.enums.attributeAliasToAttribute = (() => _.reduce(shipMatcher.enums.attributeAlias, (obj, value, key) => {
+    _.forEach(value, aliasItem => {
+        obj[aliasItem] = key;
+    });
+    return obj;
+}, {}))();
+shipMatcher.featureConfig.compareAndTags.mapping = {
+    [shipMatcher.enums.attributes.id]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttr("id"),
+    [shipMatcher.enums.attributes.lv]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttr("lv"),
+    [shipMatcher.enums.attributes.cond]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttr("cond"),
+    [shipMatcher.enums.attributes.slot]: (ruleItem, compareItem, item, attr) => {
+        if (compareItem.value == null || compareItem.value === "")
+            return;
+        return compare(item.ship?.slot?.length ?? 0, _.toNumber(compareItem.value), compareItem.operator);
+    },
+    [shipMatcher.enums.attributes.event]: (ruleItem, compareItem, item, attr) => {
+        if (compareItem.value == null || compareItem.value === "")
+            return;
+        return compare(item.sally, _.toNumber(compareItem.value), compareItem.operator);
+    },
+
+    [shipMatcher.enums.attributes.hp]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttrWithDefaultAndMax("hp"),
+    [shipMatcher.enums.attributes.fire]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttrWithDefaultAndMax("fire"),
+    [shipMatcher.enums.attributes.torpedo]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttrWithDefaultAndMax("torpedo"),
+    [shipMatcher.enums.attributes.aa]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttrWithDefaultAndMax("aa"),
+    [shipMatcher.enums.attributes.asw]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttrWithDefaultAndMax("asw"),
+    [shipMatcher.enums.attributes.armor]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttrWithDefaultAndMax("armor"),
+    [shipMatcher.enums.attributes.evasion]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttrWithDefaultAndMax("evasion"),
+    [shipMatcher.enums.attributes.luck]: shipMatcher.featureConfig.compareAndTags.functionGenerator.compareByAttrWithDefaultAndMax("luck"),
+
+    [shipMatcher.enums.attributes.lock]: (ruleItem, compareItem, item, attr) => {
+        return compare(item.locked, 1, compareItem.operator, compareItem.isNotEqualTag);
+    },
+    [shipMatcher.enums.attributes["4n"]]: (ruleItem, compareItem, item, attr) => {
+        return compare(item.hp.mod4, shipMatcher.enums.mod4[attr[0]], compareItem.operator, compareItem.isNotEqualTag);
+    },
+    [shipMatcher.enums.attributes.speed]: shipMatcher.featureConfig.compareAndTags.functionGenerator.tagByAttrAndEnum("speed"),
+    [shipMatcher.enums.attributes.range]: shipMatcher.featureConfig.compareAndTags.functionGenerator.tagByAttrAndEnum("range"),
+    [shipMatcher.enums.attributes.navy]: (ruleItem, compareItem, item, attr) => {
+        return compare(item.navy, attr[0], compareItem.operator, compareItem.isNotEqualTag);
+    },
+};
+
+shipMatcher.extractors = {
+    [matcherMarkupTypes.brackets]: (pool, ruleItem) => {
+        let content = ruleItem.content;
+        let searchPattern = "";
+        let minLength = content.length;
+
+        let firstChar = (content || "")[0];
+        switch (firstChar) {
+            case "'": // include match
+            case "!": // inverse-exact match
+                searchPattern = `${firstChar}"${content.substring(1)}"`;
+                minLength--;
+                break;
+            case "*": // fuzzy match
+                searchPattern = `"${content.substring(1)}"`;
+                minLength--;
+                break;
+            default: // exact match
+                searchPattern = `="${content}"`;
+                break;
+            case "$": // custom rule
+                searchPattern = content.substring(1);
+                minLength = 1;
+                break;
+        }
+
+        return new Fuse(pool, {
+            keys: ["search.shipType"],
+            minMatchCharLength: minLength,
+            useExtendedSearch: true,
+        }).search(searchPattern).map(resultItem => resultItem.item);
+    },
+    [matcherMarkupTypes.chevrons]: (pool, ruleItem) => {
+        let content = ruleItem.content;
+        let searchPattern = "";
+        let minLength = content.length;
+
+        let firstChar = (content || "")[0];
+        switch (firstChar) {
+            case "'": // include match
+            case "!": // inverse-exact match
+                searchPattern = `${firstChar}"${content.substring(1)}"`;
+                minLength--;
+                break;
+            case "*": // fuzzy match
+                searchPattern = `"${content.substring(1)}"`;
+                minLength--;
+                break;
+            default: // exact match
+                searchPattern = `="${content}"`;
+                break;
+            case "$": // custom rule
+                searchPattern = content.substring(1);
+                minLength = 1;
+                break;
+        }
+
+        return new Fuse(pool, {
+            keys: ["search.shipClass"],
+            minMatchCharLength: minLength,
+            useExtendedSearch: true,
+        }).search(searchPattern).map(resultItem => resultItem.item);
+    },
+    [matcherMarkupTypes.plain]: (pool, ruleItem) => {
+        let content = ruleItem.content;
+        let searchPattern = "";
+        let minLength = content.length;
+
+        let firstChar = (content || "")[0];
+        switch (firstChar) {
+            case "=": // exact match
+            case "'": // include match
+            case "!": // inverse-exact match
+                searchPattern = `${firstChar}"${content.substring(1)}"`;
+                minLength--;
+                break;
+            default: // fuzzy match
+                searchPattern = `"${content}"`;
+                break;
+            case "$": // custom rule
+                searchPattern = content.substring(1);
+                minLength = 1;
+                break;
+        }
+
+        return new Fuse(pool, {
+            keys: ["search.shipName"],
+            minMatchCharLength: minLength,
+            useExtendedSearch: true,
+        }).search(searchPattern).map(resultItem => resultItem.item);
+    },
+    [matcherMarkupTypes.compare]: (pool, ruleItem) => {
+        let compareItem = ruleItem.compare;
+        return _.filter(pool, item => {
+            let attr = compareItem.attr.split(":").map(str => str.trim());
+            attr[0] = (attr[0] ?? "").toLowerCase();
+
+            let attributeType = shipMatcher.enums.attributeAliasToAttribute[attr[0]];
+            if (!attributeType)
+                return;
+            return (shipMatcher.featureConfig.compareAndTags.mapping[attributeType] ?? _.noop)(ruleItem, compareItem, item, attr);
+        });
+    },
+};
+
 const playerShipsSelector = createSelector([shipsSelector], ships => _.map(ships, item => playerShipDataFactory(item)));
 const searchBarInputSelector = createSelector([pluginDataSelector], pluginData => _.get(pluginData, "cache.ships.searchBarInput"))
 const playerShipsMatchByRulesSelector = createSelector([playerShipsSelector, searchBarInputSelector], (playerShips, searchBarInput) => {

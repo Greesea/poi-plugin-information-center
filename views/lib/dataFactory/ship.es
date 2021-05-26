@@ -41,6 +41,7 @@ export const playerShipDataFactory = playerShipRaw => {
 
     data.hp = Object.create(null);
     data.hp.value = playerShipRaw.api_nowhp;
+    data.hp.default = data.ship?.stat.hp ?? 0;
     data.hp.max = playerShipRaw.api_maxhp;
     data.hp.mod4 = data.hp.max % 4;
     data.speed = Object.create(null);
