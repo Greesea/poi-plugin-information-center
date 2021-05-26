@@ -9,6 +9,7 @@ export const playerShipDataFactory = playerShipRaw => {
     data.id = playerShipRaw.api_id;
     data.raw = playerShipRaw;
     data.shipId = playerShipRaw.api_ship_id;
+    data.dexId = playerShipRaw.api_sortno;
     data.ship = kckit.get.ship(data.shipId);
     data.shipType = kckit.get.shipType(data.ship?.type);
     data.shipClass = kckit.get.shipClass(data.ship?.class);

@@ -44,6 +44,11 @@ const shipMatcher = {
             speed: 16,
             range: 17,
             navy: 18,
+
+            //sort use
+            sort_dexid: 100,
+            sort_speed: 101,
+            sort_range: 102,
         },
 
         mod4: {
@@ -133,6 +138,25 @@ const shipMatcher = {
                 },
             },
         },
+        sort: {
+            functionGenerator: {
+                getPath: (path) => {
+                    return attr => path;
+                },
+                getPathWithDefault: (path) => {
+                    return attr => {
+                        let modifier = ["default"].indexOf(attr[1]) > -1 ? attr[1] : "";
+                        return `${path}${modifier ? "." + modifier : ".value"}`
+                    };
+                },
+                getPathWithDefaultAndMax: (path) => {
+                    return attr => {
+                        let modifier = ["default", "max"].indexOf(attr[1]) > -1 ? attr[1] : "";
+                        return `${path}${modifier ? "." + modifier : ".value"}`
+                    };
+                },
+            }
+        }
     },
 };
 shipMatcher.enums.attributeAlias = {
@@ -156,6 +180,11 @@ shipMatcher.enums.attributeAlias = {
     [shipMatcher.enums.attributes.speed]: ["tei", "teisoku", "di", "disu", "slow", "kou", "kousoku", "gao", "gaosu", "fast", "kou", "kousoku", "gao", "gaosu", "fast", "sai", "saisoku", "zui", "zuisu", "fastest"],
     [shipMatcher.enums.attributes.range]: ["tan", "duan", "short", "chuu", "zhong", "mid", "cho", "naga", "chang", "long", "chocho", "chonaga", "chao", "chaochang", "verylong"],
     [shipMatcher.enums.attributes.navy]: ["ijn", "km", "rm", "mn", "rn", "usn", "vmf", "ran", "rnln", "rocn"],
+
+    //sort use
+    [shipMatcher.enums.attributes.sort_dexid]: ["zukan", "zukann", "tujian", "dexid"],
+    [shipMatcher.enums.attributes.sort_speed]: ["sokuryoku", "sudu", "speed"],
+    [shipMatcher.enums.attributes.sort_range]: ["shatei", "shecheng", "range"],
 };
 shipMatcher.enums.attributeAliasToAttribute = (() => _.reduce(shipMatcher.enums.attributeAlias, (obj, value, key) => {
     _.forEach(value, aliasItem => {
@@ -198,6 +227,23 @@ shipMatcher.featureConfig.compareAndTags.mapping = {
     [shipMatcher.enums.attributes.navy]: (ruleItem, compareItem, item, attr) => {
         return compare(item.navy, attr[0], compareItem.operator, compareItem.isNotEqualTag);
     },
+};
+shipMatcher.featureConfig.sort.mapping = {
+    [shipMatcher.enums.attributes.id]: shipMatcher.featureConfig.sort.functionGenerator.getPath("id"),
+    [shipMatcher.enums.attributes.sort_dexid]: shipMatcher.featureConfig.sort.functionGenerator.getPath("dexId"),
+    [shipMatcher.enums.attributes.lv]: shipMatcher.featureConfig.sort.functionGenerator.getPath("lv"),
+    [shipMatcher.enums.attributes.cond]: shipMatcher.featureConfig.sort.functionGenerator.getPath("cond"),
+    [shipMatcher.enums.attributes.slot]: shipMatcher.featureConfig.sort.functionGenerator.getPath("slot"),
+    [shipMatcher.enums.attributes.hp]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefaultAndMax("hp"),
+    [shipMatcher.enums.attributes.fire]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefaultAndMax("fire"),
+    [shipMatcher.enums.attributes.torpedo]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefaultAndMax("torpedo"),
+    [shipMatcher.enums.attributes.aa]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefaultAndMax("aa"),
+    [shipMatcher.enums.attributes.asw]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefaultAndMax("asw"),
+    [shipMatcher.enums.attributes.armor]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefaultAndMax("armor"),
+    [shipMatcher.enums.attributes.evasion]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefaultAndMax("evasion"),
+    [shipMatcher.enums.attributes.luck]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefaultAndMax("luck"),
+    [shipMatcher.enums.attributes.sort_speed]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefault("speed"),
+    [shipMatcher.enums.attributes.sort_range]: shipMatcher.featureConfig.sort.functionGenerator.getPathWithDefault("range"),
 };
 
 shipMatcher.extractors = {
@@ -294,8 +340,7 @@ shipMatcher.extractors = {
     [matcherMarkupTypes.compare]: (pool, ruleItem) => {
         let compareItem = ruleItem.compare;
         return _.filter(pool, item => {
-            let attr = compareItem.attr.split(":").map(str => str.trim());
-            attr[0] = (attr[0] ?? "").toLowerCase();
+            let attr = compareItem.attr.split(":").map(str => str.trim().toLowerCase());
 
             let attributeType = shipMatcher.enums.attributeAliasToAttribute[attr[0]];
             if (!attributeType)
@@ -308,12 +353,38 @@ shipMatcher.extractors = {
 const playerShipsSelector = createSelector([shipsSelector], ships => _.map(ships, item => playerShipDataFactory(item)));
 const searchBarInputSelector = createSelector([pluginDataSelector], pluginData => _.get(pluginData, "cache.ships.searchBarInput"))
 const playerShipsMatchByRulesSelector = createSelector([playerShipsSelector, searchBarInputSelector], (playerShips, searchBarInput) => {
-    //TODO add sort support
+    let searchInput = (searchBarInput ?? "").split("@");
+    let sortRule;
+    if (searchInput.length > 1) {
+        let sortRuleText = searchInput[1];
 
-    return _.flatten(
+        sortRule = _.reduce(_.filter(_.map(sortRuleText.split(","), item => (item ?? "").trim())), (storage, sortRuleItem) => {
+            let array = _.filter(sortRuleItem.split(" "));
+            let attr = array[0].split(":").map(str => str.trim().toLowerCase());
+            let order = array[1];
+            let attributeType = shipMatcher.enums.attributeAliasToAttribute[attr[0]];
+            let orderKey = (shipMatcher.featureConfig.sort.mapping[attributeType] ?? _.noop)(attr);
+
+            if (!orderKey || ["asc", "desc"].indexOf(order) === -1)
+                return storage;
+
+            storage.keys.push(orderKey);
+            storage.orders.push(order);
+            return storage;
+        }, {keys: [], orders: []});
+
+        debugConsole().log("ships sort info", {
+            sortRuleText,
+            searchInput,
+            sortRule
+        });
+    }
+    searchInput = searchInput[0];
+
+    let matchedItems = _.flatten(
         _.reduce(
             matcher(playerShips, {
-                rules: parseMatcherRules(searchBarInput),
+                rules: parseMatcherRules(searchInput),
                 extractors: shipMatcher.extractors,
             }),
             (storage, item) => {
@@ -329,6 +400,8 @@ const playerShipsMatchByRulesSelector = createSelector([playerShipsSelector, sea
             {mapping: {}, array: []}
         ).array
     );
+
+    return sortRule?.keys.length ? _.orderBy(matchedItems, sortRule.keys, sortRule.orders) : matchedItems;
 });
 //endregion
 
@@ -642,7 +715,7 @@ const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
             <div className="list">
                 <AutoSizer>
                     {({width, height}) => {
-                        console.log(props.matchedShips);
+                        debugConsole().log("render ships", props.matchedShips);
                         return (
                             <List
                                 width={width}
