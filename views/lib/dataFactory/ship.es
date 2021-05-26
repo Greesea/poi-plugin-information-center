@@ -20,8 +20,8 @@ export const playerShipDataFactory = playerShipRaw => {
 
     data.display = Object.create(null);
     data.display.name = data.ship.getName("", LANGUAGE);
-    data.display.class = data.shipType?.code ?? "";
-    data.display.type = data.shipClass?.getName(LANGUAGE) ?? "";
+    data.display.type = data.shipType?.code ?? "";
+    data.display.class = data.shipClass?.getName(LANGUAGE) ?? "";
 
     data.lv = playerShipRaw.api_lv;
     data.cond = playerShipRaw.api_cond;

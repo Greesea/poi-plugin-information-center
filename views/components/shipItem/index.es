@@ -25,12 +25,12 @@ function ShipItem(props) {
             </div>
             <div className="basic">
                 <div className="name">
-                    <div className="name-content">{item.ship.getName("", LANGUAGE)}</div>
+                    <div className="name-content">{item.display.name}</div>
                     <div className="name-lv">
                         <span>Lv.{item.lv}</span>
                     </div>
                 </div>
-                <div className="suffix">{item.shipType?.code ?? ""} {item.shipClass?.getName(LANGUAGE) ?? ""}</div>
+                <div className="suffix">{item.display.type} {item.display.class}</div>
             </div>
             <div className="info">
                 <Tooltip content={t("components.shipItem.hp", item.hp)}>
