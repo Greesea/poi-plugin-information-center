@@ -22,6 +22,12 @@ let emptyConsole = new Proxy(Object.create(null), {
 });
 
 let debugState = false;
+let defineProp = (function (obj) {
+    return Object.assign({}, this, obj);
+}).bind({
+    configurable: true,
+    enumerable: true,
+});
 
 export const debugConsole = () => debugState ? proxyConsole : emptyConsole;
 export const debugEnable = () => {
@@ -37,30 +43,31 @@ export const debugEnable = () => {
                 reloadPlugin(EXTENSION_KEY);
             }
         },
-        clear: {
-            get: () => {
-                return function () {
-                    Array.from(arguments).forEach(type => {
-                        switch (type) {
-                            case "settings":
-                                debugConsole().warn("clear settings");
-                                window.config.set(`plugin.${EXTENSION_KEY}.pluginSettings`, {});
-                                break;
-                            case "reload":
-                                debugConsole().warn("reload plugin");
-                                debugEntry.reload();
-                                break;
-                        }
-                    });
-                }
-            }
-        },
-        kckit: {
+        clear: defineProp({
+            get: () => function () {
+                Array.from(arguments).forEach(type => {
+                    switch (type) {
+                        case "settings":
+                            debugConsole().warn("clear settings");
+                            window.config.set(`plugin.${EXTENSION_KEY}.pluginSettings`, {});
+                            break;
+                        case "reload":
+                            debugConsole().warn("reload plugin");
+                            debugEntry.reload();
+                            break;
+                    }
+                });
+            },
+        }),
+        kckit: defineProp({
             get: () => kckit,
-        },
-        state: {
+        }),
+        state: defineProp({
             get: () => debugState,
-        },
+        }),
+        openDevTools: defineProp({
+            get: () => debugOpenDevTools
+        }),
     });
 
     if (!window.__debug_plugin)
@@ -75,5 +82,13 @@ export const debugCleanup = () => {
     debugState = false;
 
     if (window.__debug_plugin && window.__debug_plugin[EXTENSION_NAME])
-        delete window.__debug_plugin[EXTENSION_NAME];
+        _.forEach(Object.keys(window.__debug_plugin[EXTENSION_NAME]), key => {
+            delete window.__debug_plugin[EXTENSION_NAME][key];
+        });
+};
+export const debugOpenDevTools = () => {
+    let remoteWindow = remote.require("electron").BrowserWindow.getAllWindows().find(url => url.getURL().endsWith(EXTENSION_KEY));
+    remoteWindow?.openDevTools({
+        mode: "detach",
+    });
 };
