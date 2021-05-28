@@ -1,19 +1,127 @@
 import _ from "lodash";
 import React, {useState, useEffect} from "react";
 import {t} from "../../i18n.es";
+import styled from "styled-components";
 
+import {Tooltip} from "views/components/etc/overlay";
 import {Avatar} from "views/components/etc/avatar";
 import {getShipAvatarColorByTag} from "views/utils/game-utils";
-import {Tooltip} from "@blueprintjs/core";
+// import {} from "@blueprintjs/core";
 
 import {LANGUAGE, RES} from "../../constants.es";
+
+const $ShipItem = styled.div`
+    position: relative;
+    display: flex;
+
+    margin-bottom: 4px;
+    padding-right: 4px;
+    height: 46px;
+    background: rgba(0, 0, 0, 0.07);
+    
+    .bp3-dark & {
+        background: rgba(0, 0, 0, 0.25);
+        
+        .basic {
+            .name .name-lv, .suffix {
+                color: #cccccc;
+            }
+        }
+    }
+
+    .accent {
+        position: absolute;
+
+        left: 0;
+        top: 0;
+
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .avatar {
+        flex-shrink: 0;
+
+        width: 86px;
+    }
+
+    .basic {
+        display: flex;
+        flex-flow: column;
+
+        flex-grow: 1;
+        flex-shrink: 1;
+
+        .name {
+            display: flex;
+            flex-flow: row nowrap;
+
+            overflow: hidden;
+
+            .name-content {
+                flex-shrink: 0;
+
+                font-size: 20px;
+                margin-right: 4px;
+            }
+
+            .name-lv {
+                display: flex;
+                flex-flow: column nowrap;
+
+                flex-grow: 1;
+                flex-shrink: 1;
+                justify-content: flex-end;
+
+                font-size: 12px;
+                color: #666666;
+            }
+        }
+
+        .suffix {
+            color: #666666;
+            font-size: 12px;
+        }
+    }
+
+    .info {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-between;
+
+        flex-shrink: 0;
+        width: 110px;
+
+        & > .bp3-popover-wrapper {
+            flex-basis: 48%;
+            flex-shrink: 0;
+        }
+
+        .info-item {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+
+            .icon {
+                width: 20px;
+                height: 20px;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                }
+            }
+        }
+    }
+`;
 
 function ShipItem(props) {
     let item = props.item;
     let sallyColors = props.config?.fcdShipTagColor;
 
     return (
-        <div className="shipItem">
+        <$ShipItem>
             {
                 sallyColors && sallyColors.length && item.sally ?
                     <div className="accent" style={{background: `linear-gradient(to left, transparent, ${getShipAvatarColorByTag(item.sally, sallyColors)})`}}></div> :
@@ -66,7 +174,7 @@ function ShipItem(props) {
                     </div>
                 </Tooltip>
             </div>
-        </div>
+        </$ShipItem>
     )
 }
 

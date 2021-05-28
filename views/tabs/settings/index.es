@@ -3,12 +3,18 @@ import React, {useState, useEffect} from "react";
 import {connect} from "react-redux";
 import {createSelector} from "reselect";
 import {t} from "../../i18n.es";
+import styled from "styled-components";
 
-import "./index.css";
 import {Card, Elevation, Switch} from "@blueprintjs/core";
 import {pluginSettingsSelector} from "../../../redux/selectors.es";
 import {tabsList as ROOT_TABS_LIST, tabsIdList as ROOT_TABS_ID_LIST} from "../loader.es";
 import {EXTENSION_KEY} from "../../constants.es";
+
+const $Tab = styled.div`
+    .bp3-control.bp3-switch .bp3-control-indicator::before {
+        cursor: pointer;
+    }
+`;
 
 const pluginSettingsTabSettingsRootTabsSelector = createSelector([pluginSettingsSelector], settings => settings?.root?.tabs ?? ROOT_TABS_ID_LIST);
 const selector = createSelector([pluginSettingsSelector, pluginSettingsTabSettingsRootTabsSelector], (settings, settingsRootTabs) => ({
@@ -25,7 +31,7 @@ const mapDispatchToProps = dispatch => ({
 
 const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
     return (
-        <div className={`plugin-root-tabs-item-settings`}>
+        <$Tab>
             <Card className={"plugin-settings-tabs"} elevation={Elevation.ONE}>
                 <h4>{t("tabs.settings.toggleTabs.title")}</h4>
                 <div>
@@ -41,7 +47,7 @@ const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
                     }
                 </div>
             </Card>
-        </div>
+        </$Tab>
     )
 });
 

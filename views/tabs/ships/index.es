@@ -1,12 +1,13 @@
 import _ from "lodash";
-import Fuse from "../../../node_modules/fuse.js";
 import React, {useState, useEffect} from "react";
 import {connect} from "react-redux";
 import {createSelector} from "reselect";
 import {t} from "../../i18n.es";
+import styled from "styled-components";
+import Fuse from "../../../node_modules/fuse.js";
 
-import "./index.css";
-import {Alert, Button, FormGroup, HTMLTable, InputGroup, Intent, Tooltip} from "@blueprintjs/core";
+import {Tooltip} from "views/components/etc/overlay";
+import {Alert, Button, FormGroup, HTMLTable, InputGroup, Intent} from "@blueprintjs/core";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import ShipItem from "../../components/shipItem/index";
@@ -18,7 +19,29 @@ import {matcher, matcherMarkupTypes, parseMatcherRules} from "../../lib/matcher/
 import {EXTENSION_KEY, LANGUAGE, RES} from "../../constants.es";
 import {debugConsole} from "../../lib/debug/index.es";
 
-const shipsSelector = createSelector([infoSelector], info => info.ships);
+const $Tab = styled.div`
+    display: flex;
+    flex-flow: column nowrap;
+
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    .search {
+        flex-grow: 0;
+        flex-shrink: 0;
+
+        margin: 1px 2px 4px;
+        padding-bottom: 8px;
+
+        border-bottom: 1px solid #5C7080;
+    }
+
+    .list {
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+`;
 
 //region selector - ships
 const shipMatcher = {
@@ -350,6 +373,7 @@ shipMatcher.extractors = {
     },
 };
 
+const shipsSelector = createSelector([infoSelector], info => info.ships);
 const playerShipsSelector = createSelector([shipsSelector], ships => _.map(ships, item => playerShipDataFactory(item)));
 const searchBarInputSelector = createSelector([pluginDataSelector], pluginData => _.get(pluginData, "cache.ships.searchBarInput"))
 const playerShipsMatchByRulesSelector = createSelector([playerShipsSelector, searchBarInputSelector], (playerShips, searchBarInput) => {
@@ -450,7 +474,7 @@ const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
     };
 
     return (
-        <div className={`plugin-root-tabs-item-ships`}>
+        <$Tab>
             <Alert
                 isOpen={searchExtraButtonCheatsheetState}
                 canEscapeKeyCancel={true}
@@ -728,7 +752,7 @@ const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
                     }}
                 </AutoSizer>
             </div>
-        </div>
+        </$Tab>
     )
 });
 

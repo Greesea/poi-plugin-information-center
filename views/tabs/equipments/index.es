@@ -3,12 +3,14 @@ import React, {useState, useEffect} from "react";
 import {connect} from "react-redux";
 import {createSelector} from "reselect";
 import {t} from "../../i18n.es";
+import styled from "styled-components";
 
-import "./index.css";
 import {Tooltip} from "@blueprintjs/core";
 import FA from "react-fontawesome"
 import {constSelector, infoSelector, pluginSettingsSelector, pluginResourceSelector} from "../../../redux/selectors.es";
 import {EXTENSION_KEY} from "../../constants.es";
+
+const $Tab = styled.div``;
 
 const selector = createSelector(
     [constSelector, infoSelector, pluginResourceSelector],
@@ -23,9 +25,9 @@ const mapDispatchToProps = dispatch => ({});
 
 const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
     return (
-        <div className={`plugin-root-tabs-item-equipments`}>
+        <$Tab>
             equipments
-        </div>
+        </$Tab>
     )
 });
 

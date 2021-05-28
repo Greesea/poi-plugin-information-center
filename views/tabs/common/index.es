@@ -3,15 +3,154 @@ import React, {useState, useEffect} from "react";
 import {connect} from "react-redux";
 import {createSelector} from "reselect";
 import {t} from "../../i18n.es";
+import styled from "styled-components";
 
-import "./index.css";
-import {Tooltip} from "@blueprintjs/core";
+import {Tooltip} from "views/components/etc/overlay";
+// import {} from "@blueprintjs/core";
 import FA from "react-fontawesome"
 import {constSelector, infoSelector, pluginSettingsSelector, pluginResourceSelector} from "../../../redux/selectors.es";
 import {EXTENSION_KEY} from "../../constants.es";
 
-//region 特殊处理
+const $Tab = styled.div`
+    .useItem-list {
+        display: flex;
+        flex-flow: row wrap;
+    
+        height: 100%;
+    
+        .item {
+            display: flex;
+            flex-flow: row nowrap;
+    
+            @media screen and (min-width: 471px) {
+                flex: 0 1 calc((100% / 2) - 8px);
+            }
+            @media screen and (min-width: 761px) {
+                flex: 0 1 calc((100% / 3) - 8px);
+            }
+            flex: 0 1 calc(100% - 8px);
+            margin: 4px;
+            background: rgba(0, 0, 0, 0.075);
+            overflow-x: hidden;
+    
+            .icon {
+                flex-grow: 0;
+                flex-shrink: 0;
+                align-self: center;
+    
+                width: 32px;
+                height: 32px;
+                margin: 0 8px;
+    
+                img {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+    
+            .content {
+                display: flex;
+                flex-flow: column nowrap;
+    
+                flex: 1 1 0;
+                overflow-x: hidden;
+    
+                .title {
+                    @title-height: 26px;
+    
+                    display: flex;
+                    flex-flow: row nowrap;
+    
+                    flex: 0 0 26px;
+                    overflow: hidden;
+    
+                    .title-name {
+                        flex: 1 1 0;
+                        line-height: 26px;
+                        text-align: left;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                    }
+    
+                    .favourite {
+                        flex-grow: 0;
+                        flex-shrink: 0;
+                        cursor: pointer;
+                        margin-right: 8px;
+                        padding-top: 2px;
+    
+                        &.active {
+                            color: #137CBD;
+                        }
+                    }
+                }
+    
+                .amount {
+                    display: flex;
+                    flex-flow: row nowrap;
+    
+                    flex: 1 0 0;
+    
+                    & > div:first-child {
+                        flex: 1 1 50%;
+                    }
+    
+                    .amount-item, .bp3-popover-wrapper {
+                        flex: 1 0 50%;
+                    }
+    
+                    .bp3-popover-target {
+                        width: 100%;
+                        height: 100%;
+                    }
+    
+                    .amount-item-content {
+                        display: flex;
+                        flex-flow: row nowrap;
+    
+                        text-align: left;
+    
+                        .amount-icon {
+                            display: flex;
+    
+                            margin-top: calc(4px / 2 - 1px);
+                            margin-right: 2px;
+                            width: 14px;
+                            height: 14px;
+    
+                            img {
+                                width: 100%;
+                                height: 100%;
+                            }
+                        }
+    
+                        .amount-value {
+                            line-height: 18px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .bp3-dark & {
+        .item {
+            background: rgba(0, 0, 0, 0.25);
+        }
+    }
+`;
+
+//region ExtraInfoFurniture
 class ExtraInfoFurniture {
+    static $tooltip = styled.table`
+        .item {
+            .header {
+                text-align: right;
+                padding-right: 8px;
+            }
+        }
+    `;
     singleValue = 0;
     iconPath = "resource.icons.useItems.common_itemicons_id_44";
 
@@ -31,7 +170,7 @@ class ExtraInfoFurniture {
             icon: props => _.get(props, this.iconPath),
             value: fullValue,
             tooltip:
-                <table className="plugin-root-tabs-item-common-useItemAmountFurniturePopover">
+                <ExtraInfoFurniture.$tooltip>
                     <tbody>
                     <tr className="item">
                         <td className="header">{t("tabs.common.furnitureAmount.1x.header", {number: 1, single: this.singleValue})}</td>
@@ -50,7 +189,7 @@ class ExtraInfoFurniture {
                         <td className="value">{t("tabs.common.furnitureAmount.full.value", {value: fullValue})}</td>
                     </tr>
                     </tbody>
-                </table>
+                </ExtraInfoFurniture.$tooltip>
         });
 
         return itemData;
@@ -127,7 +266,7 @@ const AmountItem = function (props) {
 };
 const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
     return (
-        <div className={`plugin-root-tabs-item-common`}>
+        <$Tab>
             <div className="useItem-list">
                 {
                     props.useItems.map(item =>
@@ -153,7 +292,7 @@ const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
                                     {
                                         item.amount.map(amountItem =>
                                             amountItem.tooltip ?
-                                                <Tooltip wrapperTagName="div" targetTagName="div" popoverClassName={`${EXTENSION_KEY}-overlay`} content={amountItem.tooltip} lazy={true}>
+                                                <Tooltip wrapperTagName="div" targetTagName="div" content={amountItem.tooltip} lazy={true}>
                                                     <AmountItem componentProps={props} amountItem={amountItem}/>
                                                 </Tooltip>
                                                 :
@@ -168,7 +307,7 @@ const tab = connect(mapStateToProps, mapDispatchToProps)(function (props) {
                     )
                 }
             </div>
-        </div>
+        </$Tab>
     )
 });
 
